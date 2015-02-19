@@ -7,16 +7,18 @@ export DEBIAN_FRONTEND=noninteractive
 ##
 ## packages
 ##
-packages="sudo adduser curl ca-certificates openssl git lv vim man-db whiptail zsh apt-utils net-tools"
+packages="sudo adduser curl ca-certificates openssl git lv vim-tiny man-db whiptail zsh net-tools"
 packages="$packages etckeeper"
 packages="$packages locales tzdata"
-packages="$packages sysvinit-core openssh-server rsyslog cron"
+packages="$packages localepurge"
+packages="$packages sysvinit-core systemd-sysv- systemd-"
+packages="$packages openssh-server rsyslog cron"
 packages="$packages supervisor nginx-light"
 
 ##
 ## install packages
 ##
-apt-get install -y --no-install-recommends ${packages}
+apt-get install -y --no-install-recommends --auto-remove --purge ${packages}
 
 ##
 ## configure etckeeper
@@ -40,6 +42,15 @@ else
   locale-gen
 fi
 etckeeper commit "set locale"
+
+##
+## configure localepurge and remove locales
+##
+install -m 644 -o root -g root -p /build/etc/locale.nopurge /etc/locale.nopurge
+sed -i -e 's/^USE_DPKG/# USE_DPKG/' /etc/locale.nopurge
+localepurge
+sed -i -e 's/^# USE_DPKG/USE_DPKG/' /etc/locale.nopurge
+etckeeper commit "localepurge: purge locales other than en and ja"
 
 ##
 ## configure timezone
