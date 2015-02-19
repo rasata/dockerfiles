@@ -13,7 +13,7 @@ packages="$packages locales tzdata"
 packages="$packages localepurge"
 packages="$packages sysvinit-core systemd-sysv- systemd-"
 packages="$packages openssh-server rsyslog cron"
-packages="$packages supervisor nginx-light"
+#packages="$packages supervisor nginx-light"
 
 ##
 ## install packages
@@ -100,18 +100,22 @@ echo 'debian:debian' | chpasswd
 etckeeper commit "adduser debian"
 
 ##
-## configure supervisor, and disable
+## configure supervisor, and disable (if installed)
 ##
-install -m 644 -o root -g root -p /build/etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
-etckeeper commit "supervisor: set socket as root:adm 770, and enabled inet_http_server with 0.0.0.0:9001"
-insserv -r supervisor
-etckeeper commit "supervisor: disabled autostart"
+if dpkg-query -s supervisor 1>/dev/null 2>/dev/null; then
+  install -m 644 -o root -g root -p /build/etc/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+  etckeeper commit "supervisor: set socket as root:adm 770, and enabled inet_http_server with 0.0.0.0:9001"
+  insserv -r supervisor
+  etckeeper commit "supervisor: disabled autostart"
+fi
 
 ##
 ## configure nginx, and disable
 ##
-install -m 644 -o root -g root -p /build/etc/nginx/conf.d/misc.conf /etc/nginx/conf.d/misc.conf
-etckeeper commit "nginx: add conf.d/misc.conf"
-insserv -r nginx
-etckeeper commit "nginx: disabled autostart"
+if dpkg-query -s nginx-light 1>/dev/null 2>/dev/null; then
+  install -m 644 -o root -g root -p /build/etc/nginx/conf.d/misc.conf /etc/nginx/conf.d/misc.conf
+  etckeeper commit "nginx: add conf.d/misc.conf"
+  insserv -r nginx
+  etckeeper commit "nginx: disabled autostart"
+fi
 
