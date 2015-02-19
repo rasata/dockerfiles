@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 %w[
-  sudo adduser curl ca-certificates openssl git lv vim-tiny man-db whiptail zsh apt-utils net-tools
+  sudo adduser curl ca-certificates openssl git lv vim-tiny man-db whiptail zsh net-tools
   etckeeper locales tzdata localepurge sysvinit-core openssh-server rsyslog cron
 ].each do |pkg|
   describe package(pkg) do
